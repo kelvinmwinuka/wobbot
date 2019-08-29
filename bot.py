@@ -1,6 +1,7 @@
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
 import time
 import json
 
@@ -38,6 +39,23 @@ def main():
     driver.get(url_histories)
     applied_tab = driver.find_element_by_class_name("mdc-tab")
     applied_tab.click()
+
+    job_card_len = 0
+    view_more = driver.find_element_by_class_name("button-settings")
+    job_cards = driver.find_elements_by_class_name("job-card")
+
+    try:
+
+        while len(job_cards) > job_card_len:
+            job_card_len = len(job_cards)
+            view_more = driver.find_element_by_class_name("button-settings")
+            view_more.click()
+            time.sleep(5)
+            job_cards = driver.find_elements_by_class_name("job-card")
+    except NoSuchElementException:
+        print("End of the jobs list")
+
+
 
     time.sleep(10)
     driver.quit()
