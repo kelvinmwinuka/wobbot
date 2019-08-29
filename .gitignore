@@ -1,2 +1,4 @@
 credentials.json
-/.idea/*
+.iws
+*/workspace.xml
+*/tasts.xml
