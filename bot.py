@@ -4,16 +4,18 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 import time
 import json
+from tinydb import TinyDB, Query
 
 def main():
 
-    options = webdriver.ChromeOptions()
+    db = TinyDB('job_applications.json')
+    Job = Query()
 
     user_credentials = {}
-
     url_home = "https://my.wobbjobs.com"
     url_histories = url_home + "/v2/users/job_histories"
 
+    options = webdriver.ChromeOptions()
     driver = webdriver.Chrome()
     driver.get(url_home)
 
