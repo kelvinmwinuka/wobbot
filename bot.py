@@ -5,6 +5,7 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 import json
 from tinydb import TinyDB, Query
+import yagmail
 
 
 def main():
@@ -84,8 +85,23 @@ def main():
                 updated_jobs.append(job)
             pass
 
+    yag = yagmail.SMTP(user_credentials['dev-email'], user_credentials['dev-email-password'])
+    target = user_credentials['target-email']
+    body = ""
+
     # Send sms/email notification of the new job insertions
+    if len(inserted_jobs) > 0:
+        subject = "Wobb - New Jobs Found"
+        for job in inserted_jobs:
+            body += "\n\nTitle: " + job['title'] + "\nCompany: " + job['company'] + "\nStatus: " + job['status'] + "\nCreated At: " + job['date']
+        yag.send(target, subject, body)
+
     # Send sms/email notification of the updated jobs
+    if len(updated_jobs) > 0:
+        subject = "Wobb - Jobs Updated!"
+        for job in updated_jobs:
+            body += "\n\nTitle: " + job['title'] + "\nCompany: " + job['company'] + "\nStatus: " + job['status'] + "\nCreated At: " + job['date']
+        yag.send(target, subject, body)
 
     driver.quit()
 
