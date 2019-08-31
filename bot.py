@@ -17,8 +17,9 @@ def main():
     url_home = "https://my.wobbjobs.com"
     url_histories = url_home + "/v2/users/job_histories"
 
-    options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome()
+    options = Options()
+    options.add_argument("--headless")
+    driver = webdriver.Chrome(options=options)
     driver.get(url_home)
 
     # Wobb has the same tab title when logged in or out.
@@ -89,14 +90,14 @@ def main():
     target = user_credentials['target-email']
     body = ""
 
-    # Send sms/email notification of the new job insertions
+    # Send email notification of the new job insertions
     if len(inserted_jobs) > 0:
         subject = "Wobb - New Jobs Found"
         for job in inserted_jobs:
             body += "\n\nTitle: " + job['title'] + "\nCompany: " + job['company'] + "\nStatus: " + job['status'] + "\nCreated At: " + job['date']
         yag.send(target, subject, body)
 
-    # Send sms/email notification of the updated jobs
+    # Send email notification of the updated jobs
     if len(updated_jobs) > 0:
         subject = "Wobb - Jobs Updated!"
         for job in updated_jobs:
