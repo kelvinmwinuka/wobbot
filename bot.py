@@ -87,7 +87,6 @@ def main():
     # Send sms/email notification of the new job insertions
     # Send sms/email notification of the updated jobs
 
-    time.sleep(10)
     driver.quit()
 
 
