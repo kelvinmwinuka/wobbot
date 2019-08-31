@@ -9,7 +9,7 @@ from tinydb import TinyDB, Query
 
 def main():
 
-    db = TinyDB('job_applications.json')
+    db = TinyDB('jobs.json')
     Job = Query()
 
     user_credentials = {}
@@ -25,9 +25,11 @@ def main():
     login_button = driver.find_element_by_class_name("sign_up_dialog_btn")
 
     if login_button:
+
         # Load user credentials and proceed to login
         with open("credentials.json", "r") as f:
             user_credentials = json.loads(f.read())
+
         login_button.click()
         email_field = driver.find_element_by_id("email-sign-in")
         email_field.clear()
@@ -44,7 +46,6 @@ def main():
     applied_tab.click()
 
     job_card_len = 0
-    view_more = driver.find_element_by_class_name("button-settings")
     job_cards = driver.find_elements_by_class_name("job-card")
 
     try:
@@ -56,8 +57,12 @@ def main():
             time.sleep(5)
             job_cards = driver.find_elements_by_class_name("job-card")
     except NoSuchElementException:
-        print("End of the jobs list")
+        pass
 
+    # Update job cards list again with all the visible cards
+    job_cards = driver.find_elements_by_class_name("job-card")
+
+    inserted_jobs = []
     updated_jobs = []
 
     # Traverse each job card and extract job information
@@ -68,16 +73,19 @@ def main():
         date = card.find_element_by_class_name("ja-created-at").text
 
         # Check if the job exists in the database, if not, insert it.
-        jobs = db.search((Job.title == title) and (Job.company == company) and (Job.date == date))
-        if len(jobs) < 1:
+        if not db.contains((Job.title == title) & (Job.company == company) & (Job.date == date)):
             db.insert({'title': title, 'company': company, 'status': status, 'date': date})
-            # Send sms/email notification of the new job insertion
+            inserted_jobs.append(db.get((Job.title == title) & (Job.company == company) & (Job.date == date)))
         else:
             # If the job exists, check if the status has been updated and add to the 'updated' list accordingly
-            if jobs[0]['status'] != status:
-                db.update({'status': status}, (Job.title == title) and (Job.company == company) and (Job.date == date))
-                # Send sms/email notification of update
-                pass
+            job = db.get((Job.title == title) & (Job.company == company) & (Job.date == date))
+            if job['status'] != status:
+                db.update({'status': status}, (Job.title == title) & (Job.company == company) & (Job.date == date))
+                updated_jobs.append(job)
+            pass
+
+    # Send sms/email notification of the new job insertions
+    # Send sms/email notification of the updated jobs
 
     time.sleep(10)
     driver.quit()
