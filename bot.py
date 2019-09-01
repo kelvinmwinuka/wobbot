@@ -84,7 +84,6 @@ def main():
             if job['status'] != status:
                 db.update({'status': status}, (Job.title == title) & (Job.company == company) & (Job.date == date))
                 updated_jobs.append(job)
-            pass
 
     yag = yagmail.SMTP(user_credentials['dev-email'], user_credentials['dev-email-password'])
     target = user_credentials['target-email']
